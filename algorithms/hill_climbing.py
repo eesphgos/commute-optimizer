@@ -47,7 +47,6 @@ class HillClimbingSolver(LocalSearchSolver):
 
             current = next_state
             current_cost = next_cost
-            current = next_state
 
             if current_cost < best_cost:
                 best_state = current
