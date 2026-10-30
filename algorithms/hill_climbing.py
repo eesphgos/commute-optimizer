@@ -16,18 +16,45 @@ class HillClimbingSolver(LocalSearchSolver):
         self.max_sideways: int = self.params.get("max_sideways", 100)
         self.max_restarts: int = self.params.get("max_restarts", 5)
 
+    
     def solve(self) -> Tuple[State, float]:
-        """
-        Executes Hill Climbing optimization.
+        """Run basic steepest-descent hill climbing."""
+        self.history = []
 
-        Guidelines:
-        - Search through the neighborhood greedily for candidates that minimize total travel time.
-        - Handle flat local maxima / shoulders by allowing up to `max_sideways` non-improving steps.
-        - Apply up to `max_restarts` to explore different starting basins.
-        - Track the best objective cost seen at each major step in self.history.
+        current = self.problem.generate_initial_state()
+        current_cost = self.problem.evaluate(current)
 
-        Prohibited:
-        - Looping indefinitely on flat plateaus.
-        """
-        # TODO: Implement Hill Climbing with sideways moves and restarts
+        best_state = current
+        best_cost = current_cost
+        self.history.append(best_cost)
+
+        max_iterations = int(self.params.get("max_iterations", 1000))
+
+        for _ in range(max_iterations):
+            neighbors = get_neighbors(current, self.problem)
+
+            if not neighbors:
+                break
+
+            next_state = min(
+                neighbors,
+                key=lambda state: self.problem.evaluate(state)
+            )
+            next_cost = self.problem.evaluate(next_state)
+
+            if next_cost >= current_cost - 1e-9:
+                break
+
+            current = next_state
+            current_cost = next_cost
+            current = next_state
+
+            if current_cost < best_cost:
+                best_state = current
+                best_cost = current_cost
+
+            self.history.append(best_cost)
+
+        return best_state, best_cost
+
         raise NotImplementedError("Implement solve() in algorithms/hill_climbing.py")
